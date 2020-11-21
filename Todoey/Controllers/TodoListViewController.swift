@@ -53,13 +53,10 @@ class TodoListViewController: UITableViewController {
         
         cell.textLabel?.text = item.title
         
-        if item.done == true {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        //Ternary operator ==>
+        //value = condition ? valueIfTrue : valueIfFalse
         
-        
+        cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
     }
