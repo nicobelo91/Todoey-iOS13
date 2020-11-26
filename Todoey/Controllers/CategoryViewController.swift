@@ -36,8 +36,6 @@ class CategoryViewController: UITableViewController {
         
         cell.textLabel?.text = category.name
         
-        
-        
         return cell
     }
     
