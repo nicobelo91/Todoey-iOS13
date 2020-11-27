@@ -10,7 +10,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     var todoItems: Results<Item>?
     let realm = try! Realm()
@@ -26,6 +26,7 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
      
         //print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        
     }
 
 //MARK: - TableView Datasource Methods
@@ -36,19 +37,12 @@ class TodoListViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        let item = todoItems?[indexPath.row]
         
-        if let item = todoItems?[indexPath.row] {
+        cell.textLabel?.text = todoItems?[indexPath.row].title ?? "No Items Added yet"
         
-            cell.textLabel?.text = item.title
-            
-            //Ternary operator ==>
-            //value = condition ? valueIfTrue : valueIfFalse
-            
-            cell.accessoryType = item.done ? .checkmark : .none
-        } else {
-            cell.textLabel?.text = "No Items Added"
-        }
+        cell.accessoryType = item!.done ? .checkmark : .none
         
         return cell
     }
@@ -62,13 +56,13 @@ class TodoListViewController: UITableViewController {
                 try realm.write {
                     item.done = !item.done
                 }
+                
             } catch {
                 print("Error saving done status, \(error)")
             }
         }
         
         tableView.reloadData()
-        
     
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -119,6 +113,20 @@ class TodoListViewController: UITableViewController {
     
     func loadItems() {
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+    }
+
+    // MARK: - Delete Data From Swipe
+
+    override func updateModel(at indexPath: IndexPath) {
+        if let item = self.todoItems?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(item)
+                }
+            } catch {
+                print("Error deleting category, \(error)")
+            }
+        }
     }
 }
 
