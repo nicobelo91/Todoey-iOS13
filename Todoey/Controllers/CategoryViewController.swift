@@ -24,6 +24,12 @@ class CategoryViewController: SwipeTableViewController {
  
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist.")}
+        
+        navBar.backgroundColor = UIColor(hexString: "1D9BF6")
+    }
+    
     //MARK: - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -36,7 +42,14 @@ class CategoryViewController: SwipeTableViewController {
         
         cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories Added yet"
         
-        cell.backgroundColor = UIColor(hexString: categoryArray?[indexPath.row].color ?? "#FFFFFF")
+        if let category = categoryArray?[indexPath.row] {
+            
+            guard let categoryColor = UIColor(hexString: category.color) else {fatalError()}
+                                              
+            cell.backgroundColor = UIColor(hexString: category.color)
+            
+            cell.textLabel?.textColor = ContrastColorOf(categoryColor, returnFlat: true)
+        }
         
         return cell
     }
@@ -106,6 +119,8 @@ class CategoryViewController: SwipeTableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
+        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -115,4 +130,5 @@ class CategoryViewController: SwipeTableViewController {
             destinationVC.selectedCategory = categoryArray?[indexPath.row]
         }
     }
+    
 }
